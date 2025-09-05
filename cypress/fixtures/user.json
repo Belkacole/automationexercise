@@ -1,0 +1,25 @@
+{
+  "user": {
+    "name": "Elena QA",
+    "email": "elena.qa+{{timestamp}}@example.com",
+    "password": "StrongP@ssw0rd!"
+  },
+  "address": {
+    "firstName": "Elena",
+    "lastName": "Colesnicova",
+    "company": "iApartments QA",
+    "address1": "123 Cypress Ave",
+    "address2": "Suite 5",
+    "country": "United States",
+    "state": "FL",
+    "city": "Tampa",
+    "zipcode": "33647",
+    "mobile": "+18134443812"
+  },
+  "dob": {
+    "day": "10",
+    "month": "June",
+    "year": "1990"
+  },
+  "title": "Mrs"
+}
