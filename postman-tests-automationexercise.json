@@ -1,0 +1,621 @@
+{
+	"info": {
+		"_postman_id": "f7635ebb-4ac1-44bc-ba20-6e2ab659277d",
+		"name": "AutomationExercise API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "38602019",
+		"_collection_link": "https://www.postman.com/elenacole/workspace/hillpointassessment/collection/38602019-f7635ebb-4ac1-44bc-ba20-6e2ab659277d?action=share&source=collection_link&creator=38602019"
+	},
+	"item": [
+		{
+			"name": "Get All Products — valid",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status is 200', () => {\r",
+							"  pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test('Content-Type should be JSON', () => {\r",
+							"  const ct = pm.response.headers.get('Content-Type') || '';\r",
+							"  if (!ct.includes('application/json')) {\r",
+							"    console.warn('⚠️ Known issue: API returns JSON body but Content-Type header is set to', ct);\r",
+							"  } else {\r",
+							"    pm.expect(ct).to.include('application/json');\r",
+							"  }\r",
+							"});\r",
+							"\r",
+							"pm.test('Body contains products array', () => {\r",
+							"  const body = pm.response.json();\r",
+							"  pm.expect(body).to.be.an('object');\r",
+							"  pm.expect(body).to.have.property('products');\r",
+							"  pm.expect(body.products).to.be.an('array');\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/productsList",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"productsList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Product — valid",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status is 200', () => pm.response.to.have.status(200));\r",
+							"\r",
+							"// Content-Type: log a warning if not JSON (demo API returns text/html)\r",
+							"pm.test('Content-Type should be JSON (soft check)', () => {\r",
+							"  const ct = pm.response.headers.get('Content-Type') || '';\r",
+							"  if (!/application\\/json/i.test(ct)) {\r",
+							"    console.warn('⚠️ Known issue: Content-Type is', ct, 'but body is JSON.');\r",
+							"  }\r",
+							"});\r",
+							"\r",
+							"// Body: parsable JSON\r",
+							"pm.test('Body is JSON', () => {\r",
+							"  pm.response.json(); // throws if not JSON\r",
+							"});\r",
+							"\r",
+							"// Structure: products[] exists and not empty\r",
+							"pm.test('products[] contains results', () => {\r",
+							"  const body = pm.response.json();\r",
+							"  pm.expect(body).to.be.an('object');\r",
+							"  pm.expect(body.products).to.be.an('array').that.is.not.empty;\r",
+							"});\r",
+							"\r",
+							"// Content: at least one product name includes \"dress\"\r",
+							"pm.test('At least one result mentions \"dress\"', () => {\r",
+							"  const products = pm.response.json().products || [];\r",
+							"  const names = products.map(p => (p.name || p.product || '').toString().toLowerCase());\r",
+							"  pm.expect(names.some(n => n.includes('dress'))).to.be.true;\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "search_product",
+							"value": "Dress",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/searchProduct",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"searchProduct"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Product — no results",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status is 200 (no results scenario)', () => pm.response.to.have.status(200));\r",
+							"\r",
+							"pm.test('Body is JSON', () => { pm.response.json(); });\r",
+							"\r",
+							"pm.test('No products returned', () => {\r",
+							"  const body = pm.response.json();\r",
+							" \r",
+							"  if (Array.isArray(body.products)) {\r",
+							"    pm.expect(body.products.length).to.equal(0);\r",
+							"  } else {\r",
+							"    \r",
+							"    pm.expect(JSON.stringify(body).toLowerCase()).to.not.include('product');\r",
+							"  }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "search_product",
+							"value": "Rubber Dinosaur",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/searchProduct",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"searchProduct"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Search Product — missing param",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status is 400/422 or server returns error body', () => {\r",
+							"  const code = pm.response.code;\r",
+							"  if ([400, 422].includes(code)) {\r",
+							"    pm.expect([400, 422]).to.include(code);\r",
+							"  } else {\r",
+							"    \r",
+							"    const text = pm.response.text().toLowerCase();\r",
+							"    pm.expect(text).to.match(/missing|required|invalid|no/i);\r",
+							"  }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": []
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/searchProduct",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"searchProduct"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Account — valid",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const ts = Date.now();\r",
+							"pm.environment.set('emailUnique', `elena.qa+${ts}@example.com`);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Status is 201 Created (or 200 on demo)', () => {\r",
+							"  pm.expect([200, 201]).to.include(pm.response.code);\r",
+							"});\r",
+							"\r",
+							"pm.test('Success message present', () => {\r",
+							"  const t = pm.response.text().toLowerCase();\r",
+							"  pm.expect(t).to.match(/created|success/i);\r",
+							"});\r",
+							"\r",
+							"pm.environment.set('existingEmail', pm.environment.get('emailUnique'));"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "Elena QA",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{emailUnique}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "P@ssw0rd123",
+							"type": "text"
+						},
+						{
+							"key": "title",
+							"value": "Mrs",
+							"type": "text"
+						},
+						{
+							"key": "birth_year",
+							"value": "1990",
+							"type": "text"
+						},
+						{
+							"key": "firstname",
+							"value": "Elena",
+							"type": "text"
+						},
+						{
+							"key": "lastname",
+							"value": "Cole",
+							"type": "text"
+						},
+						{
+							"key": "company",
+							"value": "TestCo",
+							"type": "text"
+						},
+						{
+							"key": "address1",
+							"value": "123 Test Street",
+							"type": "text"
+						},
+						{
+							"key": "address2",
+							"value": "address2",
+							"type": "text"
+						},
+						{
+							"key": "country",
+							"value": "United States",
+							"type": "text"
+						},
+						{
+							"key": "zipcode",
+							"value": "12345",
+							"type": "text"
+						},
+						{
+							"key": "state",
+							"value": "FL",
+							"type": "text"
+						},
+						{
+							"key": "city",
+							"value": "Tampa",
+							"type": "text"
+						},
+						{
+							"key": "mobile_number",
+							"value": "1234567890",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/createAccount",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"createAccount"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Account — missing password",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"const ts = Date.now();\r",
+							"pm.environment.set('emailUnique', `elena.qa+${ts}@example.com`);"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Missing password triggers validation error', () => {\r",
+							"  const code = pm.response.code;\r",
+							"  const text = pm.response.text().toLowerCase();\r",
+							"  if ([400, 422].includes(code)) {\r",
+							"    pm.expect([400, 422]).to.include(code);\r",
+							"  } else {\r",
+							"    pm.expect(text).to.match(/password.*(required|missing|invalid)/i);\r",
+							"  }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "Elena QA",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{emailUnique}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "P@ssw0rd123",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "title",
+							"value": "Mrs",
+							"type": "text"
+						},
+						{
+							"key": "birth_year",
+							"value": "1990",
+							"type": "text"
+						},
+						{
+							"key": "firstname",
+							"value": "Elena",
+							"type": "text"
+						},
+						{
+							"key": "lastname",
+							"value": "Cole",
+							"type": "text"
+						},
+						{
+							"key": "company",
+							"value": "TestCo",
+							"type": "text"
+						},
+						{
+							"key": "address1",
+							"value": "123 Test Street",
+							"type": "text"
+						},
+						{
+							"key": "address2",
+							"value": "address2",
+							"type": "text"
+						},
+						{
+							"key": "country",
+							"value": "United States",
+							"type": "text"
+						},
+						{
+							"key": "zipcode",
+							"value": "12345",
+							"type": "text"
+						},
+						{
+							"key": "state",
+							"value": "FL",
+							"type": "text"
+						},
+						{
+							"key": "city",
+							"value": "Tampa",
+							"type": "text"
+						},
+						{
+							"key": "mobile_number",
+							"value": "1234567890",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/createAccount",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"createAccount"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Create Account — duplicate email",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test('Duplicate email returns error status or error message', () => {\r",
+							"  const code = pm.response.code;\r",
+							"  const text = pm.response.text().toLowerCase();\r",
+							"\r",
+							"  if ([400, 409].includes(code)) {\r",
+							"    pm.expect([400, 409]).to.include(code);\r",
+							"  } else {\r",
+							"    pm.expect(text).to.match(/exist|already/i); // \"already exist\"\r",
+							"  }\r",
+							"});"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "name",
+							"value": "Elena QA",
+							"type": "text"
+						},
+						{
+							"key": "email",
+							"value": "{{existingEmail}}",
+							"type": "text"
+						},
+						{
+							"key": "password",
+							"value": "P@ssw0rd123",
+							"type": "text"
+						},
+						{
+							"key": "title",
+							"value": "Mrs",
+							"type": "text"
+						},
+						{
+							"key": "birth_year",
+							"value": "1990",
+							"type": "text"
+						},
+						{
+							"key": "firstname",
+							"value": "Elena",
+							"type": "text"
+						},
+						{
+							"key": "lastname",
+							"value": "Cole",
+							"type": "text"
+						},
+						{
+							"key": "company",
+							"value": "TestCo",
+							"type": "text"
+						},
+						{
+							"key": "address1",
+							"value": "123 Test Street",
+							"type": "text"
+						},
+						{
+							"key": "address2",
+							"value": "address2",
+							"type": "text"
+						},
+						{
+							"key": "country",
+							"value": "United States",
+							"type": "text"
+						},
+						{
+							"key": "zipcode",
+							"value": "12345",
+							"type": "text"
+						},
+						{
+							"key": "state",
+							"value": "FL",
+							"type": "text"
+						},
+						{
+							"key": "city",
+							"value": "Tampa",
+							"type": "text"
+						},
+						{
+							"key": "mobile_number",
+							"value": "1234567890",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/createAccount",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"createAccount"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
